@@ -13,9 +13,8 @@ def get_deepbooru_tags(pil_image):
     shared.deepbooru_process_queue.put(pil_image)
     while shared.deepbooru_process_return["value"] == -1:
         time.sleep(0.2)
-    tags = shared.deepbooru_process_return["value"]
     release_process()
-    return tags
+    return shared.deepbooru_process_return["value"]
 
 
 def deepbooru_process(queue, deepbooru_process_return, threshold, alpha_sort):
@@ -102,11 +101,7 @@ def get_deepbooru_tags_from_model(model, tags, pil_image, threshold, alpha_sort)
 
     y = model.predict(image)[0]
 
-    result_dict = {}
-
-    for i, tag in enumerate(tags):
-        result_dict[tag] = y[i]
-
+    result_dict = {tag: y[i] for i, tag in enumerate(tags)}
     unsorted_tags_in_theshold = []
     result_tags_print = []
     for tag in tags:
@@ -116,17 +111,10 @@ def get_deepbooru_tags_from_model(model, tags, pil_image, threshold, alpha_sort)
             unsorted_tags_in_theshold.append((result_dict[tag], tag))
             result_tags_print.append(f'{result_dict[tag]} {tag}')
 
-    # sort tags
-    result_tags_out = []
-    sort_ndx = 0
-    if alpha_sort:
-        sort_ndx = 1
-
+    sort_ndx = 1 if alpha_sort else 0
     # sort by reverse by likelihood and normal for alpha
     unsorted_tags_in_theshold.sort(key=lambda y: y[sort_ndx], reverse=(not alpha_sort))
-    for weight, tag in unsorted_tags_in_theshold:
-        result_tags_out.append(tag)
-
+    result_tags_out = [tag for weight, tag in unsorted_tags_in_theshold]
     print('\n'.join(sorted(result_tags_print, reverse=True)))
 
     return ', '.join(result_tags_out).replace('_', ' ').replace(':', ' ')

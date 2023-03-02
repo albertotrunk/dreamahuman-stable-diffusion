@@ -144,11 +144,14 @@ class EmbeddingDatabase:
         if possible_matches is None:
             return None, None
 
-        for ids, embedding in possible_matches:
-            if tokens[offset:offset + len(ids)] == ids:
-                return embedding, len(ids)
-
-        return None, None
+        return next(
+            (
+                (embedding, len(ids))
+                for ids, embedding in possible_matches
+                if tokens[offset : offset + len(ids)] == ids
+            ),
+            (None, None),
+        )
 
 
 def create_embedding(name, num_vectors_per_token, init_text='*'):
@@ -199,7 +202,7 @@ def train_embedding(embedding_name, learn_rate, data_root, log_directory, traini
         os.makedirs(images_embeds_dir, exist_ok=True)
     else:
         images_embeds_dir = None
-        
+
     cond_model = shared.sd_model.cond_stage_model
 
     shared.state.textinfo = f"Preparing dataset from {html.escape(data_root)}..."
@@ -284,11 +287,11 @@ def train_embedding(embedding_name, learn_rate, data_root, log_directory, traini
                 data = torch.load(last_saved_file)
                 info.add_text("sd-ti-embedding", embedding_to_b64(data))
 
-                title = "<{}>".format(data.get('name', '???'))
+                title = f"<{data.get('name', '???')}>"
                 checkpoint = sd_models.select_checkpoint()
                 footer_left = checkpoint.model_name
-                footer_mid = '[{}]'.format(checkpoint.hash)
-                footer_right = '{}'.format(embedding.step)
+                footer_mid = f'[{checkpoint.hash}]'
+                footer_right = f'{embedding.step}'
 
                 captioned_image = caption_image_overlay(image, title, footer_left, footer_mid, footer_right)
                 captioned_image = insert_image_data_embed(captioned_image, data)

@@ -65,11 +65,10 @@ class Hypernetwork:
         return res
 
     def save(self, filename):
-        state_dict = {}
-
-        for k, v in self.layers.items():
-            state_dict[k] = (v[0].state_dict(), v[1].state_dict())
-
+        state_dict = {
+            k: (v[0].state_dict(), v[1].state_dict())
+            for k, v in self.layers.items()
+        }
         state_dict['step'] = self.step
         state_dict['name'] = self.name
         state_dict['sd_checkpoint'] = self.sd_checkpoint
@@ -115,7 +114,7 @@ def load_hypernetwork(filename):
             print(traceback.format_exc(), file=sys.stderr)
     else:
         if shared.loaded_hypernetwork is not None:
-            print(f"Unloading hypernetwork")
+            print("Unloading hypernetwork")
 
         shared.loaded_hypernetwork = None
 

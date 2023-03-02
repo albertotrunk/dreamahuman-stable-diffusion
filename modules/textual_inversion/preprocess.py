@@ -33,7 +33,7 @@ def preprocess(process_src, process_dst, process_width, process_height, process_
 
     def save_pic_with_caption(image, index):
         if process_caption:
-            caption = "-" + shared.interrogator.generate_caption(image)
+            caption = f"-{shared.interrogator.generate_caption(image)}"
             caption = sanitize_caption(os.path.join(dst, f"{index:05}-{subindex[0]}"), caption, ".png")
         elif process_caption_deepbooru:
             shared.deepbooru_process_return["value"] = -1

@@ -11,7 +11,7 @@ class LearnScheduleIterator:
         self.rates = []
         self.it = 0
         self.maxit = 0
-        for i, pair in enumerate(pairs):
+        for pair in pairs:
             tmp = pair.split(':')
             if len(tmp) == 2:
                 step = int(tmp[1])
@@ -33,11 +33,10 @@ class LearnScheduleIterator:
         return self
 
     def __next__(self):
-        if self.it < self.maxit:
-            self.it += 1
-            return self.rates[self.it - 1]
-        else:
+        if self.it >= self.maxit:
             raise StopIteration
+        self.it += 1
+        return self.rates[self.it - 1]
 
 
 class LearnRateScheduler:

@@ -18,7 +18,11 @@ def create_hypernetwork(name, enable_sizes):
 
     shared.reload_hypernetworks()
 
-    return gr.Dropdown.update(choices=sorted([x for x in shared.hypernetworks.keys()])), f"Created: {fn}", ""
+    return (
+        gr.Dropdown.update(choices=sorted(list(shared.hypernetworks.keys()))),
+        f"Created: {fn}",
+        "",
+    )
 
 
 def train_hypernetwork(*args):

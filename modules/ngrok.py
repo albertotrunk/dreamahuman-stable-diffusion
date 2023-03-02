@@ -2,7 +2,7 @@ from pyngrok import ngrok, conf, exception
 
 
 def connect(token, port):
-    if token == None:
+    if token is None:
         token = 'None'
     conf.get_default().auth_token = token
     try:
